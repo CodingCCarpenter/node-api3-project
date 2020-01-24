@@ -10,16 +10,34 @@ router.get('/', (req, res) => {
   })
   .catch(err => {
     console.log(err)
-    res.status(500).json({ errorMessage: "Trouble accessing the posts"})
+    res.status(404).json({ errorMessage: "Trouble accessing the posts"})
   })
 });
 
 router.get('/:id', (req, res) => {
   // do your magic!
+  const id = req.params.id;
+  postDb.getById(id)
+  .then(post => {
+      res.status(200).json({post})
+  })
+  .catch(err => {
+    console.log(err)
+    res.status(404).json({errorMessage: "Could not retrieve specified ID"})
+  })
 });
 
 router.delete('/:id', (req, res) => {
   // do your magic!
+  const id = req.params.id
+  postDb.remove(id)
+    .then(post => {
+      res.status(200).json({post})
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(404).json({ message : "The post could not be removed."})
+    })
 });
 
 router.put('/:id', (req, res) => {
