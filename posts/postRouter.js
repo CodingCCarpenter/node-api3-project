@@ -42,6 +42,16 @@ router.delete('/:id', (req, res) => {
 
 router.put('/:id', (req, res) => {
   // do your magic!
+  const id = req.params.id;
+  const data = req.body;
+    postDb.update(id, data)
+      .then( post => {
+        res.status(201).json({post})
+      })
+      .catch(err => {
+        console.log(err)
+        res.status(500).json({ message: "Post was not updated"})
+      })
 });
 
 // custom middleware
