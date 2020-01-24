@@ -1,21 +1,22 @@
 const express = require('express');
 
 const router = express.Router();
+const postDb = require('./postDb');
+router.use(express.json());
 
+//    /api/posts
 router.get('/', (req, res) => {
-  // do your magic!
   postDb.get()
   .then(post => {
     res.status(200).json(post)
   })
   .catch(err => {
     console.log(err)
-    res.status(404).json({ errorMessage: "Trouble accessing the posts"})
+    res.status(500).json({ errorMessage: "Trouble accessing the posts"})
   })
 });
 
-router.get('/:id', (req, res) => {
-  // do your magic!
+router.get('/:id', validatePostById, (req, res) => {
   const id = req.params.id;
   postDb.getById(id)
   .then(post => {
@@ -23,12 +24,11 @@ router.get('/:id', (req, res) => {
   })
   .catch(err => {
     console.log(err)
-    res.status(404).json({errorMessage: "Could not retrieve specified ID"})
+    res.status(500).json({errorMessage: "Could not retrieve specified ID"})
   })
 });
 
-router.delete('/:id', (req, res) => {
-  // do your magic!
+router.delete('/:id', validatePostById, (req, res) => {
   const id = req.params.id
   postDb.remove(id)
     .then(post => {
@@ -36,12 +36,11 @@ router.delete('/:id', (req, res) => {
     })
     .catch(err => {
       console.log(err)
-      res.status(404).json({ message : "The post could not be removed."})
+      res.status(500).json({ message : "The post could not be removed."})
     })
 });
 
-router.put('/:id', (req, res) => {
-  // do your magic!
+router.put('/:id', validatePostById, validatePost, (req, res) => {
   const id = req.params.id;
   const data = req.body;
     postDb.update(id, data)
@@ -55,6 +54,7 @@ router.put('/:id', (req, res) => {
 });
 
 // custom middleware
+
 function validatePost(req, res, next) {
   const data = req.body;
   if(!data){
@@ -66,8 +66,7 @@ function validatePost(req, res, next) {
   }
 }
 
-function validatePostId(req, res, next) {
-  // do your magic!
+function validatePostById(req, res, next) {
   const id = req.params.id;
   postDb.getById(id)
   .then(post => {
@@ -78,5 +77,6 @@ function validatePostId(req, res, next) {
     }
   })
 }
+
 
 module.exports = router;
