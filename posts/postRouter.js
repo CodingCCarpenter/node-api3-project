@@ -55,9 +55,28 @@ router.put('/:id', (req, res) => {
 });
 
 // custom middleware
+function validatePost(req, res, next) {
+  const data = req.body;
+  if(!data){
+    res.status(400).json({ message: 'missing post data.'})
+} else if(!data.text){
+    res.status(400).json({ message: "missing  required text field"})
+} else { 
+  next();
+  }
+}
 
 function validatePostId(req, res, next) {
   // do your magic!
+  const id = req.params.id;
+  postDb.getById(id)
+  .then(post => {
+    if(!post) {
+      res.status(404).json({error: 'The specified ID does not exist.'})
+    } else {
+      next();
+    }
+  })
 }
 
 module.exports = router;
